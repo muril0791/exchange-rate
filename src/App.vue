@@ -5,7 +5,7 @@
     <settings-component v-model="showSettings" :rate-source="rateSource" @update-rate-source="rateSource = $event"/>
     <v-main>
       <v-container>
-        <currency-selector @currency-change="handleCurrencyChange"/>
+        <!-- <currency-selector @currency-change="handleCurrencyChange"/> -->
         <exchange-rate-display
           :fromCurrency="fromCurrency"
           :toCurrency="toCurrency"

@@ -1,102 +1,90 @@
 <template>
-    <v-card class="mb-4">
-      <v-card-title>Cotação do Dia</v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="fromCurrency"
-                :items="currencies"
-                label="De"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="toCurrency"
-                :items="currencies"
-                label="Para"
-              ></v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="amount"
-                :label="`De: ${fromCurrency} (Quantidade)`"
-                type="number"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <!-- <v-text-field
-                :value="convertedAmount"
-                :label="`Para: ${toCurrency} (Valor convertido)`"
-                type="number"
-                readonly
-              ></v-text-field> -->
-              <span
-              class="v-text-field"
-              :label="`Para: ${toCurrency} (Valor convertido)`"
-              outlined
-              readonly
-            >{{ convertedAmount }}</span>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-    </v-card>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        fromCurrency: 'BRL',
-        toCurrency: 'ARG',
-        amount: '',
-        convertedAmount: '',
-        currencies: ['USD', 'BRL', 'EUR', 'ARG'],
-        conversionTimer: null
-      };
-    },
-    watch: {
-      amount(newVal) {
-        clearTimeout(this.conversionTimer);
-        this.conversionTimer = setTimeout(() => {
-          this.convertAmount();
-        }, 500); // Defina o tempo que deseja aguardar após o término de digitação
+  <v-card class="mb-4 exchange-rate-card">
+    <v-card-title class="headline">Cotação do Dia</v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-select v-model="fromCurrency" :items="currencies" label="De" outlined dense></v-select>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-select v-model="toCurrency" :items="currencies" label="Para" outlined dense></v-select>
+          </v-col>
+        </v-row>
+        <v-row class="pt-4">
+          <v-col cols="12" md="6">
+            <v-text-field v-model="amount" :label="`De: ${fromCurrency} (Quantidade)`" type="number" outlined dense @input="convertAmount"></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6" class="display-converted-amount">
+            {{ displayConversionResult }}
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      fromCurrency: 'BRL',
+      toCurrency: 'ARG',
+      amount: 1,
+      convertedAmount: '',
+      currencies: ['USD', 'BRL', 'EUR', 'ARG', 'PESO'],
+      exchangeRates: {
+        'BRLtoARG': 250,
+        'ARGtoBRL': 0.004,
+        // Adicione outras taxas fixas aqui conforme necessário
       },
-      fromCurrency() {
-        this.convertAmount();
-      },
-      toCurrency() {
-        this.convertAmount();
-      }
-    },
-    methods: {
-      convertAmount() {
-        if (this.amount && !isNaN(this.amount)) {
-          // Simule a taxa de câmbio, você pode substituir essa lógica pela chamada à API
-          const fakeExchangeRate = 250;
-          this.convertedAmount = (this.amount * fakeExchangeRate).toFixed(2);
-          // Atualize o histórico
-          this.updateHistory();
-        } else {
-          this.convertedAmount = '';
-        }
-      },
-      updateHistory() {
-        const historyItem = {
-          from: this.fromCurrency,
-          to: this.toCurrency,
-          amount: `${this.amount} ${this.fromCurrency}`,
-          convertedAmount: `${this.convertedAmount} ${this.toCurrency}`,
-          date: new Date().toLocaleDateString()
-        };
-        // Adicione lógica para atualizar o histórico
-        console.log("Histórico atualizado:", historyItem);
-      }
+    };
+  },
+  computed: {
+    displayConversionResult() {
+      return `Para: ${this.toCurrency} (Valor convertido): ${this.convertedAmount}`;
     }
-  };
-  </script>
-  
+  },
+  methods: {
+    convertAmount() {
+      const rateKey = `${this.fromCurrency}to${this.toCurrency}`;
+      const exchangeRate = this.exchangeRates[rateKey];
+
+      if (exchangeRate && this.amount) {
+        this.convertedAmount = (this.amount * exchangeRate).toFixed(2);
+      } else {
+        this.convertedAmount = "Taxa de câmbio não disponível";
+      }
+    },
+  },
+  mounted() {
+    this.convertAmount(); // Realiza uma conversão inicial com valores padrão
+  },
+};
+</script>
+
+<style>
+.exchange-rate-card {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.display-converted-amount {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.v-select, .v-text-field {
+  background-color: white;
+}
+
+.headline {
+  color: #1976D2;
+  font-weight: normal;
+}
+</style>

@@ -1,11 +1,21 @@
 <template>
   <v-app class="app">
-    <navbar-component @open-login="showLogin = true" @open-settings="toggleSettings = !toggleSettings" />
+    <navbar-component
+      @open-login="showLogin = true"
+      @open-settings="toggleSettings = !toggleSettings"
+    />
     <v-dialog v-model="showLogin" width="500px">
-      <login-component v-if="!isSignup" @toggle-form="isSignup = !isSignup" @close-dialog="showLogin = false" />
-      <signup-component v-else @toggle-form="isSignup = !isSignup" @close-dialog="showLogin = false" />
+      <v-card v-if="!isSignup"
+        ><login-component
+          @toggle-form="isSignup = !isSignup"
+          @close-dialog="showLogin = false"
+      /></v-card>
+      <v-card v-else
+        ><signup-component
+          @toggle-form="isSignup = !isSignup"
+          @close-dialog="showLogin = false"
+      /></v-card>
     </v-dialog>
-    <!-- SettingsComponent pode ser reintegrado conforme a necessidade do projeto -->
     <v-main>
       <v-container>
         <exchange-rate-display
@@ -14,28 +24,24 @@
           :rate="currentRate"
           @conversion-completed="updateHistory"
         />
-        <exchange-history :history="exchangeHistory" />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import NavbarComponent from './components/NavbarComponent.vue';
-import LoginComponent from './components/LoginComponent.vue';
-import SignupComponent from './components/SignupComponent.vue'; // Assegure-se de ter este componente
-// Importe SettingsComponent se estiver sendo usado
-import ExchangeRateDisplay from './components/ExchangeRateDisplay.vue';
-import ExchangeHistory from './components/ExchangeHistory.vue';
+import NavbarComponent from "./components/NavbarComponent.vue";
+import LoginComponent from "./components/LoginComponent.vue";
+import SignupComponent from "./components/SignupComponent.vue"; // Assegure-se de ter este componente
+import ExchangeRateDisplay from "./components/ExchangeRateDisplay.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     NavbarComponent,
     LoginComponent,
     SignupComponent, // Incluído para cadastro
     ExchangeRateDisplay,
-    ExchangeHistory,
     // Inclua SettingsComponent aqui, se necessário
   },
   data() {
@@ -43,12 +49,12 @@ export default {
       showLogin: false,
       showSettings: false,
       isSignup: false, // Estado para alternar entre login e cadastro
-      fromCurrency: 'USD',
-      toCurrency: 'BRL',
+      fromCurrency: "USD",
+      toCurrency: "BRL",
       amount: 100,
       currentRate: 5.42, // Este valor deve ser dinâmico conforme suas necessidades
       exchangeHistory: [],
-      rateSource: 'Western Union', // ou 'Minha Cotação'
+      rateSource: "Western Union", // ou 'Minha Cotação'
     };
   },
   methods: {
@@ -67,14 +73,14 @@ export default {
         date: new Date().toLocaleDateString(),
       });
     },
-  }
+  },
 };
 </script>
 
 <style scoped>
 .app {
   width: auto;
-  background: grey;
+  background: #333333;
   color: white;
   height: auto;
 }

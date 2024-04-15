@@ -1,86 +1,73 @@
 <template>
   <v-app class="app">
-    <navbar-component
-      @open-login="showLogin = true"
-      @open-settings="toggleSettings = !toggleSettings"
-    />
-    <v-dialog v-model="showLogin" width="500px">
-      <v-card v-if="!isSignup"
-        ><login-component
-          @toggle-form="isSignup = !isSignup"
-          @close-dialog="showLogin = false"
-      /></v-card>
-      <v-card v-else
-        ><signup-component
-          @toggle-form="isSignup = !isSignup"
-          @close-dialog="showLogin = false"
-      /></v-card>
-    </v-dialog>
+    <navbar-component @open-history="toggleHistoryModal" @open-cart="showCart = true"
+      @open-exchange="showCart = false" />
     <v-main>
       <v-container>
-        <exchange-rate-display
-          :fromCurrency="fromCurrency"
-          :toCurrency="toCurrency"
-          :rate="currentRate"
-          @conversion-completed="updateHistory"
-        />
+        <exchange-rate-display v-if="!showCart" :fromCurrency="fromCurrency" :toCurrency="toCurrency"
+          :rate="currentRate" @conversion="updateHistory" @rate-updated="currentRate = $event" />
+        <shopping-cart v-if="showCart" :currencyX="fromCurrency" :currencyY="toCurrency" :exchangeRateXtoY="currentRate"
+          @close-cart="showCart = false" />
       </v-container>
     </v-main>
+    <v-dialog v-model="showHistory" max-width="600px">
+      <v-card style="background-color: #E0E0E0;">
+        <v-card-title>Historial de Conversões</v-card-title>
+        <v-card-text>
+          <exchange-history :history="exchangeHistory"></exchange-history>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="showHistory = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import NavbarComponent from "./components/NavbarComponent.vue";
-import LoginComponent from "./components/LoginComponent.vue";
-import SignupComponent from "./components/SignupComponent.vue"; // Assegure-se de ter este componente
 import ExchangeRateDisplay from "./components/ExchangeRateDisplay.vue";
+import ShoppingCart from "./components/ShoppingCart.vue";
+import ExchangeHistory from "./components/ExchangeHistory.vue";
 
 export default {
   name: "App",
   components: {
     NavbarComponent,
-    LoginComponent,
-    SignupComponent, // Incluído para cadastro
     ExchangeRateDisplay,
-    // Inclua SettingsComponent aqui, se necessário
+    ShoppingCart,
+    ExchangeHistory,
   },
   data() {
     return {
-      showLogin: false,
-      showSettings: false,
-      isSignup: false, // Estado para alternar entre login e cadastro
-      fromCurrency: "USD",
-      toCurrency: "BRL",
-      amount: 100,
-      currentRate: 5.42, // Este valor deve ser dinâmico conforme suas necessidades
+      showCart: false,
+      showHistory: false,
+      fromCurrency: "BRL",
+      toCurrency: "ARG",
+      currentRate: 201, // Exemplo fixo
       exchangeHistory: [],
-      rateSource: "Western Union", // ou 'Minha Cotação'
     };
   },
   methods: {
-    toggleSettings() {
-      this.showSettings = !this.showSettings;
-    },
-    fetchExchangeRate() {
-      // Implemente a lógica de busca da taxa de câmbio aqui
+    toggleHistoryModal() {
+      this.showHistory = !this.showHistory;
     },
     updateHistory(conversionDetails) {
-      this.exchangeHistory.push({
-        from: conversionDetails.from,
-        to: conversionDetails.to,
-        rate: conversionDetails.rate,
-        amount: `${conversionDetails.amount} ${conversionDetails.from} = ${conversionDetails.convertedAmount} ${conversionDetails.to}`,
-        date: new Date().toLocaleDateString(),
-      });
+      this.exchangeHistory.unshift(conversionDetails);
+      if (this.exchangeHistory.length > 10) {
+        this.exchangeHistory.pop(); // Mantenha apenas as últimas 10 cotações
+      }
     },
   },
 };
 </script>
 
+
 <style scoped>
 .app {
   width: auto;
-  background: #333333;
+  background: #252525;
   color: white;
   height: auto;
 }

@@ -1,64 +1,99 @@
 <template>
-  <v-card class="exchange-rate-card">
-    <v-card-title class="headline text-center">Cotação do Dia</v-card-title>
+  <div class="body" style="border-radius: 20px; border: 1px solid white">
+    <v-card-title class="headline text-center"
+      >Cotação do Dia <span><img width="20px" src="../assets/coin.gif" /></span>
+    </v-card-title>
+
     <v-card-text>
       <v-container>
         <v-row align="center" justify="center">
+          <!-- Seletores de moeda com botão de switch no meio -->
           <v-col cols="12" md="5">
-            <v-select v-model="fromCurrency" :items="currencies" label="De" outlined dense @change="convertAmount"></v-select>
+            <v-select
+              v-model="currencyX"
+              :items="currencies"
+              label="Moeda X"
+              outlined
+              dense
+            ></v-select>
           </v-col>
           <v-col cols="12" md="2" class="text-center">
-            <v-btn icon @click="swapCurrencies">
+            <v-btn icon color="green" @click="swapCurrencies">
               <v-icon>mdi-swap-horizontal</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="12" md="5">
-            <v-select v-model="toCurrency" :items="currencies" label="Para" outlined dense @change="convertAmount"></v-select>
+            <v-select
+              v-model="currencyY"
+              :items="currencies"
+              label="Moeda Y"
+              outlined
+              dense
+            ></v-select>
           </v-col>
         </v-row>
+        <v-divider class="border-opacity-75 mb-5"></v-divider>
         <v-row align="center" justify="center">
-          <v-col cols="12" md="5">
-            <v-text-field v-model="amount" :label="`Quantidade (${fromCurrency})`" type="number" outlined dense @input="convertAmount"></v-text-field>
-          </v-col>
-          <v-col cols="12" md="2" class="text-center">
-            <v-switch v-model="useCustomRate" label="Usar outra cotação"></v-switch>
-          </v-col>
-          <v-col cols="12" md="5">
+          <!-- Entrada da taxa de câmbio de X para Y -->
+          <v-col cols="12" md="6">
             <v-text-field
-              v-if="useCustomRate"
-              v-model="customRates[currentRateKey]"
-              :label="`Cotação customizada de 1 ${fromCurrency} para ${toCurrency}`"
+              v-model="exchangeRateXtoY"
+              @input="updateValues()"
+              :label="`Taxa de 1 ${currencyX} para ${currencyY}`"
               type="number"
               outlined
               dense
-              @input="convertAmount"
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col>
-            <div class="display-converted-amount text-center">
-              {{ displayConversionResult }}
-            </div>
-          </v-col>
-        </v-row>
-        <!-- Campo de verificação de preço -->
+        <v-divider class="border-opacity-75 mb-5"></v-divider>
+        <v-card-title class="headline text-center h10"
+          >Cotação de {{ currencyX }} para {{ currencyY }}</v-card-title
+        >
         <v-row align="center" justify="center">
-          <v-col cols="12" md="5">
+          <!-- Entrada do valor em X para conversão em Y -->
+          <v-col cols="12" md="6">
             <v-text-field
-              v-model="priceInForeignCurrency"
-              :label="`Valor em ${toCurrency}`"
+              v-model="amountX"
+              :label="`Quantidade em ${currencyX}`"
               type="number"
               outlined
               dense
-              @input="calculatePriceInLocalCurrency"
+              @input="convertXtoY"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" md="5">
+          <!-- Resultado da conversão em Y -->
+          <v-col cols="12" md="6">
             <v-text-field
-              v-model="priceInLocalCurrency"
-              :label="`Valor em ${fromCurrency} (convertido)`"
+              v-model="convertedAmountY"
+              :label="`Valor em ${currencyY}`"
+              outlined
+              dense
+              readonly
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-divider class="border-opacity-75 mb-5"></v-divider>
+        <v-card-title class="headline text-center h10"
+          >Cotação de {{ currencyY }} para {{ currencyX }}</v-card-title
+        >
+        <v-row align="center" justify="center">
+          <!-- Entrada do valor em Y para conversão em X -->
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="amountY"
+              :label="`Quantidade em ${currencyY}`"
               type="number"
+              outlined
+              dense
+              @input="convertYtoX"
+            ></v-text-field>
+          </v-col>
+          <!-- Resultado da conversão em X -->
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="convertedAmountX"
+              :label="`Valor em ${currencyX}`"
               outlined
               dense
               readonly
@@ -67,84 +102,78 @@
         </v-row>
       </v-container>
     </v-card-text>
-  </v-card>
+  </div>
 </template>
-
 <script>
 export default {
   data() {
     return {
-      fromCurrency: 'BRL',
-      toCurrency: 'ARG',
-      amount: 1,
-      customRates: {},
-      useCustomRate: false,
-      convertedAmount: '',
-      priceInForeignCurrency: null,
-      priceInLocalCurrency: '',
-      currencies: ['USD', 'BRL', 'EUR', 'ARG', 'PESO'],
-      exchangeRates: {
-        'BRLtoARG': 250,
-        'ARGtoBRL': 0.004,
-        // Adicione outras taxas predefinidas conforme necessário
-      },
+      currencyX: "BRL",
+      currencyY: "ARG",
+      exchangeRateXtoY: 201,
+      amountX: null,
+      convertedAmountY: "",
+      amountY: null,
+      convertedAmountX: "",
+      currencies: ["USD", "EUR", "BRL", "JPY", "GBP", "ARG"],
     };
   },
-  computed: {
-    currentRateKey() {
-      return `${this.fromCurrency}to${this.toCurrency}`;
-    },
-    currentRate() {
-      if (this.useCustomRate && this.customRates[this.currentRateKey]) {
-        return this.customRates[this.currentRateKey];
-      }
-      return this.exchangeRates[this.currentRateKey] || null;
-    },
-    displayConversionResult() {
-      if (this.currentRate !== null) {
-        return `Valor convertido: ${this.convertedAmount} ${this.toCurrency}`;
-      }
-      return 'Taxa de câmbio não disponível.';
-    }
-  },
   methods: {
+    updateHistory(conversionDetails) {
+      this.exchangeHistory.unshift({
+        date: conversionDetails.date,
+        amountX: conversionDetails.amount,
+        currencyX: conversionDetails.currencyX,
+        convertedAmountY: conversionDetails.convertedAmount,
+        currencyY: conversionDetails.currencyY,
+      });
+
+      if (this.exchangeHistory.length > 10) {
+        this.exchangeHistory.pop();
+      }
+      this.showHistory = false;
+    },
+    convertXtoY() {
+      if (this.exchangeRateXtoY && this.amountX) {
+        this.convertedAmountY = (this.amountX * this.exchangeRateXtoY).toFixed(
+          2
+        );
+        this.emitHistoryUpdate("XtoY");
+      }
+    },
+    convertYtoX() {
+      if (this.exchangeRateXtoY && this.amountY) {
+        this.convertedAmountX = (this.amountY / this.exchangeRateXtoY).toFixed(
+          2
+        );
+        this.emitHistoryUpdate("YtoX");
+      }
+    },
+    updateRate() {
+      this.$emit("rate-updated", this.exchangeRateXtoY);
+    },
     swapCurrencies() {
-      [this.fromCurrency, this.toCurrency] = [this.toCurrency, this.fromCurrency];
-      this.convertAmount();
+      [this.currencyX, this.currencyY] = [this.currencyY, this.currencyX];
+      this.exchangeRateXtoY = 0;
+      this.amountX = null;
+      this.amountY = null;
+      this.convertedAmountX = "";
+      this.convertedAmountY = "";
     },
-    convertAmount() {
-      if (this.currentRate) {
-        this.convertedAmount = (this.amount * this.currentRate).toFixed(2);
-      } else {
-        this.convertedAmount = '---';
-      }
+    emitHistoryUpdate(direction) {
+      const detail = {
+        currencyX: this.currencyX,
+        currencyY: this.currencyY,
+        rate: this.exchangeRateXtoY,
+        amount: direction === "XtoY" ? this.amountX : this.amountY,
+        convertedAmount:
+          direction === "XtoY" ? this.convertedAmountY : this.convertedAmountX,
+        date: new Date().toLocaleString(),
+        direction,
+      };
+      this.$emit("conversion", detail);
     },
-    calculatePriceInLocalCurrency() {
-      if (this.useCustomRate && this.customRates[this.currentRateKey]) {
-        const reverseRate = 1 / this.customRates[this.currentRateKey];
-        this.priceInLocalCurrency = (this.priceInForeignCurrency * reverseRate).toFixed(2);
-      } else if (this.exchangeRates[this.currentRateKey]) {
-        const reverseRate = 1 / this.exchangeRates[this.currentRateKey];
-        this.priceInLocalCurrency = (this.priceInForeignCurrency * reverseRate).toFixed(2);
-      } else {
-        this.priceInLocalCurrency = 'Taxa de câmbio não disponível';
-      }
-    },
-  },
-  watch: {
-    fromCurrency: "convertAmount",
-    toCurrency: "convertAmount",
-    amount: "convertAmount",
-    customRates: {
-      handler: "convertAmount",
-      deep: true
-    },
-    useCustomRate: "convertAmount",
-    priceInForeignCurrency: "calculatePriceInLocalCurrency",
-  },
-  mounted() {
-    this.convertAmount();
+   
   },
 };
-
 </script>

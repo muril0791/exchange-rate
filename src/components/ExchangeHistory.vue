@@ -28,6 +28,7 @@ export default {
 <style scoped>
 .v-list-item {
   align-items: center;
+  margin: 6px;
 }
 
 .v-list-item-icon {

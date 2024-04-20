@@ -1,45 +1,28 @@
 <template>
   <v-app class="app">
-    <navbar-component
-      @open-history="toggleHistoryModal"
-      @open-cart="showCart = true"
-      @open-exchange="showCart = false"
-    />
+    <navbar-component @open-history="toggleHistoryModal" @open-cart="showCart = true"
+      @open-exchange="showCart = false" />
     <v-main>
       <v-container>
-        <exchange-rate-display
-          v-if="!showCart"
-          :fromCurrency="fromCurrency"
-          :toCurrency="toCurrency"
-          :rate="currentRate"
-          @conversion="updateHistory"
-          @rate-updated="currentRate = $event"
-        />
-        <shopping-cart
-          v-if="showCart"
-          :currencyX="fromCurrency"
-          :currencyY="toCurrency"
-          :exchangeRateXtoY="currentRate"
-          @close-cart="showCart = false"
-        />
+        <exchange-rate-display v-if="!showCart" :fromCurrency="fromCurrency" :toCurrency="toCurrency"
+          :rate="currentRate" @conversion="updateHistory" @rate-updated="currentRate = $event"
+          @currency-changed="updateCurrencies" />
+
+        <shopping-cart v-if="showCart" :currencyX="fromCurrency" :currencyY="toCurrency" :exchangeRateXtoY="currentRate"
+          @close-cart="showCart = false" />
       </v-container>
     </v-main>
     <v-dialog v-model="showHistory" max-width="600px">
       <v-card class="ma-10">
-        <v-card-title
-          ><span>Historial de Conversões</span
-          ><span style="margin: 6px;"
-            ><img width="20px" height="20px" src="./assets/change.png"
-          /></span>
+        <v-card-title><span>Historial de Conversões</span><span style="margin: 6px;"><img width="20px" height="20px"
+              src="./assets/change.png" /></span>
         </v-card-title>
         <v-card-text>
           <exchange-history :history="exchangeHistory"></exchange-history>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="showHistory = false"
-            >Fechar</v-btn
-          >
+          <v-btn color="green darken-1" text @click="showHistory = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -66,19 +49,36 @@ export default {
       showHistory: false,
       fromCurrency: "BRL",
       toCurrency: "ARG",
-      currentRate: 201, // Exemplo fixo
+      currentRate: 210, 
       exchangeHistory: [],
     };
   },
+  created() {
+    this.loadHistory();
+  },
   methods: {
-    toggleHistoryModal() {
-      this.showHistory = !this.showHistory;
+    loadHistory() {
+      const savedHistory = localStorage.getItem('history');
+      if (savedHistory) {
+        this.exchangeHistory = JSON.parse(savedHistory);
+      }
     },
     updateHistory(conversionDetails) {
       this.exchangeHistory.unshift(conversionDetails);
       if (this.exchangeHistory.length > 10) {
         this.exchangeHistory.pop(); // Mantenha apenas as últimas 10 cotações
       }
+      this.saveHistory();
+    },
+    saveHistory() {
+      localStorage.setItem('history', JSON.stringify(this.exchangeHistory));
+    },
+    toggleHistoryModal() {
+      this.showHistory = !this.showHistory;
+    },
+    updateCurrencies(from, to) {
+      this.fromCurrency = from;
+      this.toCurrency = to;
     },
   },
 };

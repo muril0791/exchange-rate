@@ -3,7 +3,7 @@
     <v-card-title class="headline text-center">Shopping car
       <v-card-subtitle class="headline text-right">{{
         exchangeRateXtoY
-      }}</v-card-subtitle></v-card-title>
+        }}</v-card-subtitle></v-card-title>
     <v-container>
       <v-row>
         <v-col cols="12" md="6">
@@ -14,6 +14,7 @@
             dense></v-text-field>
         </v-col>
         <v-col cols="12" md="6">
+          <label style="margin-left: 8px; margin-bottom: 6px">Quantidade:</label>
           <stepper-button :initial-value="productQuantity" @update:value="(value) => (productQuantity = value)" />
         </v-col>
         <v-col cols="12" class="mb-2">
@@ -22,7 +23,7 @@
         </v-col>
       </v-row>
       <v-card-title>Itens:</v-card-title>
-      <v-list class="mt-2 pa-2" style="background: none; border: 1px solid grey; border-radius: 20px"
+      <v-list class="mt-2 pa-2" style="background: none; border: 1px solid grey; border-radius: 5px"
         color="transparent">
         <v-list-item-group style="background: none">
           <v-list-item v-for="(item, index) in cart" :key="index">
@@ -30,28 +31,34 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                overflow-x: visible;
               ">
-              {{ item.name }}: {{ item.priceY }} {{ currencyY }} ({{
-                item.priceX
-              }}
-              {{ currencyX }})
-              <span class="crudBtn" style="
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                ">
-                <v-col>
-                  <!-- Vincule o initialValue ao item.quantity e atualize diretamente essa propriedade -->
+              {{ item.name }}: {{ item.priceY }} {{ currencyY }} 
+
+              
+                <v-col style="display: flex; justify-content: end; margin-right: 8px;">
                   <stepper-button :initial-value="item.quantity"
                     @update:value="(value) => updateQuantity(index, value)" />
                 </v-col>
-                <v-btn class="mr-2" icon @click="openEditModal(item, index)">
-                  <v-icon color="orange">mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn icon @click="deleteItem(index)">
-                  <v-icon color="red">mdi-delete</v-icon>
-                </v-btn>
-              </span>
+              <v-menu  transition="slide-x-transition">
+                <template v-slot:activator="{ props }">
+                  <v-btn class="buttonMenuMobile" icon v-bind="props">
+                    <v-icon style="color: black;">mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list style="background-color: transparent; border: none">
+                  <v-list-item style=" border: none">
+                    <v-btn class=" mr-2" icon @click="openEditModal(item, index)">
+                      <v-icon color="orange">mdi-pencil</v-icon>
+                    </v-btn>
+                  </v-list-item>
+                  <v-list-item style=" border: none">
+                    <v-btn icon @click="deleteItem(index)">
+                      <v-icon color="red">mdi-delete</v-icon>
+                    </v-btn>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -67,8 +74,7 @@
           <v-text-field v-model="editItemData.name" label="Nome do Produto" outlined dense></v-text-field>
           <v-text-field v-model="editItemData.priceY" :label="`Preço em ${currencyY}`" type="number" outlined
             dense></v-text-field>
-          <v-text-field v-model="editItemData.quantity" label="Quantidade" type="number" outlined
-            dense></v-text-field>
+          <v-text-field v-model="editItemData.quantity" label="Quantidade" type="number" outlined dense></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -208,14 +214,23 @@ export default {
   padding-left: 1em;
   padding-right: 1em;
 }
-
 .item-list {
   margin-bottom: 8px;
   align-items: center;
 }
-
 .item-actions {
   display: flex;
   justify-content: flex-end;
+}
+.buttonMenuMobile{
+  margin-left: 8px;
+}
+@media (width: 600px) and (min-width: 720px){
+  .buttonMenuMobile {
+    display: block;
+  }
+  .MenuDesktop {
+    display: none;
+  }
 }
 </style>

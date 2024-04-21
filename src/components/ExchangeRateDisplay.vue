@@ -1,5 +1,5 @@
 <template>
-  <div class="body" style="border-radius: 20px; border: 1px solid white">
+  <div class="body">
     <v-card-title class="headline text-center">Cotação do Dia <span><img width="20px" src="../assets/coin.gif" /></span>
     </v-card-title>
 

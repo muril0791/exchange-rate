@@ -1,5 +1,5 @@
 <template>
-  <div style="border-radius: 20px; border: 1px solid whitesmoke">
+  <div>
     <v-card-title class="headline text-center">Shopping car
       <v-card-subtitle class="headline text-right">{{
         exchangeRateXtoY
@@ -23,7 +23,7 @@
         </v-col>
       </v-row>
       <v-card-title>Itens:</v-card-title>
-      <v-list class="mt-2 pa-2" style="background: none; border: 1px solid grey; border-radius: 5px"
+      <v-list class="mt-1 pa-1" style="background: none;"
         color="transparent">
         <v-list-item-group style="background: none">
           <v-list-item v-for="(item, index) in cart" :key="index">

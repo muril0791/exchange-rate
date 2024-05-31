@@ -8,9 +8,4 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
   },
-  resolve: {
-    alias: {
-      "vue-router": "vue-router/dist/vue-router.esm-bundler.js",
-    },
-  },
 });

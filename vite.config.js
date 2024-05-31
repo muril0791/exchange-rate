@@ -8,4 +8,7 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
   },
+  scripts: {
+    build: "node --trace-warnings node_modules/.bin/vite build",
+  },
 });

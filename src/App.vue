@@ -1,5 +1,6 @@
 <template>
   <div class="app min-h-screen bg-gray-900 text-white">
+    <SpeedInsights />
     <navbar-component @open-history="toggleHistoryModal" @open-cart="showCart = true"
       @open-exchange="showCart = false" />
     <main class="container mx-auto p-4">
@@ -32,6 +33,7 @@ import NavbarComponent from "./components/NavbarComponent.vue";
 import ExchangeRateDisplay from "./components/ExchangeRateDisplay.vue";
 import ShoppingCart from "./components/ShoppingCart.vue";
 import ExchangeHistory from "./components/ExchangeHistory.vue";
+import { SpeedInsights } from "@vercel/speed-insights/vue"
 
 export default {
   name: "App",
@@ -40,6 +42,7 @@ export default {
     ExchangeRateDisplay,
     ShoppingCart,
     ExchangeHistory,
+    SpeedInsights
   },
   data() {
     return {

@@ -1,6 +1,5 @@
 <template>
   <div class="app min-h-screen bg-gray-900 text-white">
-    <SpeedInsights />
     <navbar-component @open-history="toggleHistoryModal" @open-cart="showCart = true"
       @open-exchange="showCart = false" />
     <main class="container mx-auto p-4">
@@ -41,7 +40,6 @@ export default {
     ExchangeRateDisplay,
     ShoppingCart,
     ExchangeHistory,
-
   },
   data() {
     return {

@@ -33,7 +33,6 @@ import NavbarComponent from "./components/NavbarComponent.vue";
 import ExchangeRateDisplay from "./components/ExchangeRateDisplay.vue";
 import ShoppingCart from "./components/ShoppingCart.vue";
 import ExchangeHistory from "./components/ExchangeHistory.vue";
-import { SpeedInsights } from "@vercel/speed-insights/vue"
 
 export default {
   name: "App",
@@ -42,7 +41,7 @@ export default {
     ExchangeRateDisplay,
     ShoppingCart,
     ExchangeHistory,
-    SpeedInsights
+
   },
   data() {
     return {

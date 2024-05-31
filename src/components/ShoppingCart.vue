@@ -1,72 +1,51 @@
 <template>
-  <div>
-    <v-card-title class="headline text-center">Shopping car
-      <v-card-subtitle class="headline text-right">{{
-        exchangeRateXtoY
-        }}</v-card-subtitle></v-card-title>
-    <v-container>
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-text-field v-model="productName" label="Nome do Produto" outlined dense></v-text-field>
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-text-field v-model="productPriceY" :label="`Preço em ${currencyY}`" type="number" outlined
-            dense></v-text-field>
-        </v-col>
-        <v-col cols="12" md="6">
-          <label style="margin-left: 8px; margin-bottom: 6px">Quantidade:</label>
-          <stepper-button :initial-value="productQuantity" @update:value="(value) => (productQuantity = value)" />
-        </v-col>
-        <v-col cols="12" class="mb-2">
-          <v-btn color="blue" :disabled="productPriceY === 0 || productName === null"
-            @click="addToCart"><v-icon>mdi-cart-arrow-down</v-icon></v-btn>
-        </v-col>
+  <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-bold">Shopping Cart</h2>
+      <span class="text-right">{{ exchangeRateXtoY }}</span>
+    </div>
+    <div class="mt-4">
+      <v-text-field v-model="productName" label="Nome do Produto" outlined dense
+        class="w-full bg-gray-700 text-white"></v-text-field>
+      <v-text-field v-model="productPriceY" :label="`Preço em ${currencyY}`" type="number" outlined dense
+        class="w-full bg-gray-700 text-white mt-2"></v-text-field>
+      <div class="mt-2">
+        <label class="block mb-1">Quantidade:</label>
+        <stepper-button :initial-value="productQuantity" @update:value="(value) => (productQuantity = value)" />
+      </div>
+      <v-row class="mt-4">
+        <v-btn color="blue" :disabled="productPriceY === 0 || productName === null" @click="addToCart"
+          class="mt-2 ma-2 rounded-full">
+          <v-icon>mdi-cart-arrow-down</v-icon> Adicionar Item
+        </v-btn>
+        <v-btn color="red" @click="deleteAllItem" class=" mt-2 ma-2 rounded-full">
+          <v-icon>mdi-delete</v-icon> Deletar
+        </v-btn>
       </v-row>
-      <v-card-title>Itens:</v-card-title>
-      <v-list class="mt-1 pa-1" style="background: none;"
-        color="transparent">
-        <v-list-item-group style="background: none">
-          <v-list-item v-for="(item, index) in cart" :key="index">
-            <v-list-item-title style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                overflow-x: visible;
-              ">
-              {{ item.name }}: {{ item.priceY }} {{ currencyY }} 
 
-              
-                <v-col style="display: flex; justify-content: end; margin-right: 8px;">
-                  <stepper-button :initial-value="item.quantity"
-                    @update:value="(value) => updateQuantity(index, value)" />
-                </v-col>
-              <v-menu  transition="slide-x-transition">
-                <template v-slot:activator="{ props }">
-                  <v-btn class="buttonMenuMobile" icon v-bind="props">
-                    <v-icon style="color: black;">mdi-dots-vertical</v-icon>
-                  </v-btn>
-                </template>
-                <v-list style="background-color: transparent; border: none">
-                  <v-list-item style=" border: none">
-                    <v-btn class=" mr-2" icon @click="openEditModal(item, index)">
-                      <v-icon color="orange">mdi-pencil</v-icon>
-                    </v-btn>
-                  </v-list-item>
-                  <v-list-item style=" border: none">
-                    <v-btn icon @click="deleteItem(index)">
-                      <v-icon color="red">mdi-delete</v-icon>
-                    </v-btn>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-      <v-divider class="border-opacity-75 mt-5 mb-5"></v-divider>
-      <div>Total em {{ currencyY }}: {{ totalY }}</div>
-      <div>Total em {{ currencyX }}: {{ totalX }}</div>
-    </v-container>
+    </div>
+    <div class="mt-4 divide-y">
+      <h3 class="font-bold">Itens:</h3>
+      <ul class="divide-y">
+        <li v-for="(item, index) in cart" :key="index" class="flex justify-between items-center py-2">
+          <span>{{ item.name }}: {{ item.priceY }} {{ currencyY }}</span>
+          <div class="flex items-center space-x-2">
+            <stepper-button :initial-value="item.quantity" @update:value="(value) => updateQuantity(index, value)" />
+            <v-btn icon @click="openEditModal(item, index)" class="text-orange-600">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn icon @click="deleteItem(index)" class="text-red-600">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="mt-4">
+      <p>Total em {{ currencyY }}: {{ totalY }}</p>
+      <p>Total em {{ currencyX }}: {{ totalX }}</p>
+    </div>
+
     <v-dialog v-model="editDialog" max-width="500px">
       <v-card>
         <v-card-title> Editar Produto </v-card-title>
@@ -85,6 +64,7 @@
     </v-dialog>
   </div>
 </template>
+
 <script>
 import StepperButton from "./StepperButton.vue";
 
@@ -95,7 +75,7 @@ export default {
     return {
       productName: "",
       productPriceY: 0,
-      productQuantity: 1, // Valor inicial ajustável conforme necessário
+      productQuantity: 1,
       cart: [],
       selectedIndex: null,
       editDialog: false,
@@ -104,17 +84,10 @@ export default {
   },
   computed: {
     totalY() {
-      return this.cart
-        .reduce((acc, item) => acc + Number(item.priceY), 0)
-        .toFixed(2);
+      return this.cart.reduce((acc, item) => acc + Number(item.priceY), 0).toFixed(2);
     },
     totalX() {
-      return this.cart
-        .reduce(
-          (acc, item) => acc + Number(item.priceY) / this.exchangeRateXtoY,
-          0
-        )
-        .toFixed(2);
+      return this.cart.reduce((acc, item) => acc + Number(item.priceY) / this.exchangeRateXtoY, 0).toFixed(2);
     },
   },
   created() {
@@ -130,12 +103,7 @@ export default {
     addToCart() {
       const unitPrice = parseFloat(this.productPriceY);
       const quantity = parseInt(this.productQuantity, 10);
-      if (
-        !isNaN(unitPrice) &&
-        !isNaN(quantity) &&
-        unitPrice > 0 &&
-        quantity > 0
-      ) {
+      if (!isNaN(unitPrice) && !isNaN(quantity) && unitPrice > 0 && quantity > 0) {
         const itemData = {
           name: this.productName,
           unitPrice: unitPrice,
@@ -170,6 +138,10 @@ export default {
       this.cart.splice(index, 1);
       this.saveCart();
     },
+    deleteAllItem(index) {
+      this.cart = [];
+      this.saveCart();
+    },
     openEditModal(item, index) {
       this.editItemData = { ...item };
       this.selectedIndex = index;
@@ -181,9 +153,7 @@ export default {
           ...this.editItemData,
           quantity: parseInt(this.editItemData.quantity, 10),
           priceY: parseFloat(this.editItemData.priceY),
-          priceX: (
-            parseFloat(this.editItemData.priceY) / this.exchangeRateXtoY
-          ).toFixed(2),
+          priceX: (parseFloat(this.editItemData.priceY) / this.exchangeRateXtoY).toFixed(2),
         };
         this.cart.splice(this.selectedIndex, 1, updatedItem);
         this.saveCart();
@@ -202,35 +172,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.v-list-item {
-  background-color: transparent;
-  border-bottom: 1px solid rgb(255, 255, 255);
-  max-height: 150px;
-  overflow: auto;
-  margin: 8px;
-  color: white;
-  padding-left: 1em;
-  padding-right: 1em;
-}
-.item-list {
-  margin-bottom: 8px;
-  align-items: center;
-}
-.item-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-.buttonMenuMobile{
-  margin-left: 8px;
-}
-@media (width: 600px) and (min-width: 720px){
-  .buttonMenuMobile {
-    display: block;
-  }
-  .MenuDesktop {
-    display: none;
-  }
-}
-</style>

@@ -1,7 +1,7 @@
 <template>
-  
-        <v-badge :color="badgeColor" size="x-large" dot></v-badge>
-   
+    <div>
+        <span :class="`inline-block w-4 h-4 rounded-full mt-3 ${badgeColor}`"></span>
+    </div>
 </template>
 
 <script>
@@ -15,13 +15,13 @@ export default {
     computed: {
         badgeColor() {
             if (this.latency < 100) {
-                return 'green';
+                return 'bg-green-500';
             } else if (this.latency >= 100 && this.latency < 200) {
-                return 'orange';
+                return 'bg-yellow-500';
             } else if (this.latency >= 200 && this.latency < 300) {
-                return 'red';
+                return 'bg-red-500';
             } else {
-                return 'black'; // Para latências muito altas
+                return 'bg-black'; // Para latências muito altas
             }
         }
     },

@@ -1,64 +1,43 @@
 <template>
-  <div class="body">
-    <v-card-title class="headline text-center">Cotação do Dia <span><img width="20px" src="../assets/coin.gif" /></span>
-    </v-card-title>
-
-    <v-card-text>
-      <v-container>
-        <v-row align="center" justify="center">
-          <!-- Seletores de moeda com botão de switch no meio -->
-          <v-col cols="12" md="5">
-            <v-select v-model="currencyX" :items="currencies" label="Moeda X" outlined dense></v-select>
-          </v-col>
-          <v-col cols="12" md="2" class="text-center">
-            <v-btn icon color="green" @click="swapCurrencies">
-              <v-icon>mdi-swap-horizontal</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="12" md="5">
-            <v-select v-model="currencyY" :items="currencies" label="Moeda Y" outlined dense></v-select>
-          </v-col>
-        </v-row>
-        <v-divider class="border-opacity-75 mb-5"></v-divider>
-        <v-row align="center" justify="center">
-          <!-- Entrada da taxa de câmbio de X para Y -->
-          <v-col cols="12" md="6">
-            <v-text-field v-model="exchangeRateXtoY" @input="updateRate(), saveExchange()"
-              :label="`Taxa de 1 ${currencyX} para ${currencyY}`" type="number" outlined dense></v-text-field>
-          </v-col>
-        </v-row>
-        <v-divider class="border-opacity-75 mb-5"></v-divider>
-        <v-card-title class="headline text-center h10">Cotação de {{ currencyX }} para {{ currencyY }}</v-card-title>
-        <v-row align="center" justify="center">
-          <!-- Entrada do valor em X para conversão em Y -->
-          <v-col cols="12" md="6">
-            <v-text-field v-model="amountX" :label="`Quantidade em ${currencyX}`" type="number" outlined dense
-              @input="convertXtoY"></v-text-field>
-          </v-col>
-          <!-- Resultado da conversão em Y -->
-          <v-col cols="12" md="6">
-            <v-text-field v-model="convertedAmountY" :label="`Valor em ${currencyY}`" outlined dense
-              readonly></v-text-field>
-          </v-col>
-        </v-row>
-        <v-divider class="border-opacity-75 mb-5"></v-divider>
-        <v-card-title class="headline text-center h10">Cotação de {{ currencyY }} para {{ currencyX }}</v-card-title>
-        <v-row align="center" justify="center">
-          <!-- Entrada do valor em Y para conversão em X -->
-          <v-col cols="12" md="6">
-            <v-text-field v-model="amountY" :label="`Quantidade em ${currencyY}`" type="number" outlined dense
-              @input="convertYtoX"></v-text-field>
-          </v-col>
-          <!-- Resultado da conversão em X -->
-          <v-col cols="12" md="6">
-            <v-text-field v-model="convertedAmountX" :label="`Valor em ${currencyX}`" outlined dense
-              readonly></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
+  <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+    <h2 class="text-center text-lg font-bold mb-4">Cotação do Dia <img class="inline-block w-5 h-5"
+        src="../assets/coin.gif" alt="Coin" /></h2>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="col-span-1">
+        <v-select v-model="currencyX" :items="currencies" label="Moeda X" outlined dense class="w-full"></v-select>
+      </div>
+      <div class="col-span-1 flex justify-center">
+        <v-btn icon color="green" @click="swapCurrencies" class="focus:outline-none">
+          <v-icon>mdi-swap-horizontal</v-icon>
+        </v-btn>
+      </div>
+      <div class="col-span-1">
+        <v-select v-model="currencyY" :items="currencies" label="Moeda Y" outlined dense class="w-full"></v-select>
+      </div>
+    </div>
+    <v-divider class="border-opacity-75 mb-5"></v-divider>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <v-text-field v-model="exchangeRateXtoY" @input="updateRate(), saveExchange()"
+          :label="`Taxa de 1 ${currencyX} para ${currencyY}`" type="number" outlined dense
+          class="w-full"></v-text-field>
+      </div>
+      <div>
+        <v-text-field v-model="amountX" @input="convertXtoY" :label="`Quantidade em ${currencyX}`" type="number"
+          outlined dense class="w-full"></v-text-field>
+        <v-text-field v-model="convertedAmountY" readonly :label="`Valor em ${currencyY}`" outlined dense
+          class="w-full mt-2"></v-text-field>
+      </div>
+      <div>
+        <v-text-field v-model="amountY" @input="convertYtoX" :label="`Quantidade em ${currencyY}`" type="number"
+          outlined dense class="w-full"></v-text-field>
+        <v-text-field v-model="convertedAmountX" readonly :label="`Valor em ${currencyX}`" outlined dense
+          class="w-full mt-2"></v-text-field>
+      </div>
+    </div>
   </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -89,19 +68,14 @@ export default {
       this.showHistory = false;
     },
     convertXtoY() {
-     
       if (this.exchangeRateXtoY && this.amountX) {
-        this.convertedAmountY = (this.amountX * this.exchangeRateXtoY).toFixed(
-          2
-        );
+        this.convertedAmountY = (this.amountX * this.exchangeRateXtoY).toFixed(2);
         this.emitHistoryUpdate("XtoY");
       }
     },
     convertYtoX() {
       if (this.exchangeRateXtoY && this.amountY) {
-        this.convertedAmountX = (this.amountY / this.exchangeRateXtoY).toFixed(
-          2
-        );
+        this.convertedAmountX = (this.amountY / this.exchangeRateXtoY).toFixed(2);
         this.emitHistoryUpdate("YtoX");
       }
     },
@@ -109,7 +83,6 @@ export default {
       this.$emit("rate-updated", this.exchangeRateXtoY);
     },
     saveExchange() {
-      // Assegura que o valor da taxa de câmbio seja uma string
       localStorage.setItem("exchangeRateXtoY", this.exchangeRateXtoY.toString());
     },
     swapCurrencies() {
@@ -127,14 +100,12 @@ export default {
         currencyY: this.currencyY,
         rate: this.exchangeRateXtoY,
         amount: direction === "XtoY" ? this.amountX : this.amountY,
-        convertedAmount:
-          direction === "XtoY" ? this.convertedAmountY : this.convertedAmountX,
+        convertedAmount: direction === "XtoY" ? this.convertedAmountY : this.convertedAmountX,
         date: new Date().toLocaleString(),
         direction,
       };
       this.$emit("conversion", detail);
     },
-   
   },
 };
 </script>

@@ -1,32 +1,30 @@
 <template>
-  <v-app class="app">
+  <div class="app min-h-screen bg-gray-900 text-white">
     <navbar-component @open-history="toggleHistoryModal" @open-cart="showCart = true"
       @open-exchange="showCart = false" />
-    <v-main>
-      <v-container>
-        <exchange-rate-display v-if="!showCart" :fromCurrency="fromCurrency" :toCurrency="toCurrency"
-          :rate="currentRate" @conversion="updateHistory" @rate-updated="currentRate = $event"
-          @currency-changed="updateCurrencies" />
-
-        <shopping-cart v-if="showCart" :currencyX="fromCurrency" :currencyY="toCurrency" :exchangeRateXtoY="currentRate"
+    <main class="container mx-auto p-4">
+      <div v-if="!showCart">
+        <exchange-rate-display :fromCurrency="fromCurrency" :toCurrency="toCurrency" :rate="currentRate"
+          @conversion="updateHistory" @rate-updated="currentRate = $event" @currency-changed="updateCurrencies" />
+      </div>
+      <div v-if="showCart">
+        <shopping-cart :currencyX="fromCurrency" :currencyY="toCurrency" :exchangeRateXtoY="currentRate"
           @close-cart="showCart = false" />
-      </v-container>
-    </v-main>
-    <v-dialog v-model="showHistory" max-width="600px">
-      <v-card class="ma-10">
-        <v-card-title><span>Historial de Conversões</span><span style="margin: 6px;"><img width="20px" height="20px"
-              src="./assets/change.png" /></span>
-        </v-card-title>
-        <v-card-text>
-          <exchange-history :history="exchangeHistory"></exchange-history>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="showHistory = false">Fechar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-app>
+      </div>
+    </main>
+    <div v-if="showHistory" class="fixed inset-0  bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+      <div class="bg-white text-black p-4 rounded-lg w-full max-w-md mx-auto">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-bold">Historial de Conversões</h2>
+          <img width="20px" height="20px" src="./assets/change.png" alt="Historial" />
+        </div>
+        <exchange-history :history="exchangeHistory"></exchange-history>
+        <div class="flex justify-end mt-4">
+          <button class="bg-green-700 text-white px-4 py-2 rounded" @click="showHistory = false">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -49,7 +47,7 @@ export default {
       showHistory: false,
       fromCurrency: "BRL",
       toCurrency: "ARG",
-      currentRate: 210, 
+      currentRate: 210,
       exchangeHistory: [],
     };
   },
@@ -66,7 +64,7 @@ export default {
     updateHistory(conversionDetails) {
       this.exchangeHistory.unshift(conversionDetails);
       if (this.exchangeHistory.length > 10) {
-        this.exchangeHistory.pop(); // Mantenha apenas as últimas 10 cotações
+        this.exchangeHistory.pop();
       }
       this.saveHistory();
     },
@@ -86,9 +84,7 @@ export default {
 
 <style scoped>
 .app {
-  width: auto;
   background: #252525;
   color: white;
-  height: auto;
 }
 </style>

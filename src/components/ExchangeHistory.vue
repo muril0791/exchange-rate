@@ -1,20 +1,18 @@
 <template>
-  <v-list dense>
-    <v-list-item-group>
-      <v-list-item v-for="(entry, index) in history" :key="index">
-        <v-list-item-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ entry.amount }} {{ entry.direction === 'XtoY' ? entry.currencyX : entry.currencyY }}
-            <v-icon small>mdi-arrow-right</v-icon>
-            {{ entry.convertedAmount }} {{ entry.direction === 'XtoY' ? entry.currencyY : entry.currencyX }}
-          </v-list-item-title>
-          <v-list-item-subtitle>{{ entry.date }}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list-item-group>
-  </v-list>
+  <ul class="space-y-2">
+    <li v-for="(entry, index) in history" :key="index" class="bg-gray-400 p-2 rounded-lg">
+      <div class="flex justify-between">
+        <span>{{ entry.amount }} {{ entry.direction === 'XtoY' ? entry.currencyX : entry.currencyY }}
+          <svg class="inline-block w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-9.5 9.5L3 11">
+            </path>
+          </svg>
+          {{ entry.convertedAmount }} {{ entry.direction === 'XtoY' ? entry.currencyY : entry.currencyX }}</span>
+        <span>{{ entry.date }}</span>
+      </div>
+    </li>
+  </ul>
 </template>
 
 <script>
@@ -24,14 +22,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.v-list-item {
-  align-items: center;
-  margin: 6px;
-}
-
-.v-list-item-icon {
-  color: var(--v-theme-primary);
-}
-</style>

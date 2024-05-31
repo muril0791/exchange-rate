@@ -1,12 +1,17 @@
-<!-- StepperButton.vue -->
 <template>
-    <div class="stepper">
-        <button @click="decrement" :disabled="value === min" class="stepper-button">
-            <v-icon>mdi-minus</v-icon>
+    <div class="flex items-center border border-gray-700 rounded-lg overflow-hidden">
+        <button @click="decrement" :disabled="value === min" class="px-4 py-2 bg-gray-700 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+            </svg>
         </button>
-        <span class="stepper-value">{{ value }}</span>
-        <button @click="increment" :disabled="value === max" class="stepper-button">
-            <v-icon>mdi-plus</v-icon>
+        <span class="px-4">{{ value }}</span>
+        <button @click="increment" :disabled="value === max" class="px-4 py-2 bg-gray-700 text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
         </button>
     </div>
 </template>
@@ -55,38 +60,9 @@ export default {
 };
 </script>
 
-
 <style>
-.stepper {
-  display: flex;
-  align-items: center;
-  border: 1.5px solid #000000;
-  border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(245, 245, 245, 0.774);
-  color: #000000;
-  max-width: 120px;
-  height: 35px;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-
-.stepper-button {
-  font-size: 18px;
-  color: white;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  color: black;
-}
-
 .stepper-button:disabled {
-  color: rgb(168, 168, 168);
-}
-
-.stepper-value {
-  padding: 0 20px;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 </style>
